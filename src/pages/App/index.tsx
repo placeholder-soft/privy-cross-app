@@ -1,29 +1,66 @@
 import { useCrossAppAccounts, usePrivy } from "@privy-io/react-auth";
-import { FC } from "react";
+import { FC, useState } from "react";
 import { GIFT_ART_APP_ID } from "../../main.tsx";
 import { useNavigate } from "react-router";
+import { ethers } from "ethers";
 
-const Contract: FC<{ address: string | undefined }> = ({ address }) => {
+const Info: FC<{ address: string | undefined }> = ({ address }) => {
   const { signMessage } = useCrossAppAccounts();
   const { ready, authenticated } = usePrivy();
   const { linkCrossAppAccount } = useCrossAppAccounts();
 
   return (
-    <div className="p-8 flex gap-6 flex-row">
-      <button
-        className="btn"
-        onClick={() => signMessage("Hello world", { address: address! })}
-        disabled={!address}
-      >
-        Sign a message
+    <>
+      <div className="p-8 flex gap-6 flex-row">
+        <button
+          className="btn"
+          onClick={() => signMessage("Hello world", { address: address! })}
+          disabled={!address}
+        >
+          Sign a message
+        </button>
+        <button
+          className="btn"
+          onClick={() => linkCrossAppAccount({ appId: GIFT_ART_APP_ID })}
+          disabled={!ready || !authenticated}
+        >
+          Link your gift account
+        </button>
+      </div>
+    </>
+  );
+};
+
+const TransferButton: FC<{ address: string | undefined }> = ({ address }) => {
+  const { sendTransaction } = useCrossAppAccounts();
+  const [transactionHash, setTransactionHash] = useState<string | null>(null);
+
+  const handleTransfer = async () => {
+    if (!address) {
+      console.error("No cross-app wallet address found");
+      return;
+    }
+
+    try {
+      const transactionRequest = {
+        // type your address
+        to: "",
+        value: ethers.toBeHex(ethers.parseEther("0.1")),
+        chainId: 11155111,
+      };
+      const hash = await sendTransaction(transactionRequest, { address });
+      setTransactionHash(hash);
+    } catch (error) {
+      console.error("Transaction failed:", error);
+    }
+  };
+
+  return (
+    <div className="flex gap-4">
+      <button className="btn" onClick={handleTransfer} disabled={!address}>
+        Transfer 0.1 ETH
       </button>
-      <button
-        className="btn"
-        onClick={() => linkCrossAppAccount({ appId: GIFT_ART_APP_ID })}
-        disabled={!ready || !authenticated}
-      >
-        Link your gift account
-      </button>
+      {transactionHash && <p>Transaction Hash: {transactionHash}</p>}
     </div>
   );
 };
@@ -38,13 +75,14 @@ export const AppPage = () => {
 
   return (
     <div className="h-screen flex flex-col justify-center items-center text-lg">
-      <div className="flex flex-col items-center border border-gray-200 rounded-lg">
-        <div className="p-8 text-sm">
+      <div className="flex flex-col items-center border border-gray-200 rounded-lg pb-12">
+        <div className="p-8 pb-0 text-sm">
           <p>wallet: {user?.wallet?.address}</p>
           <p>Cross Account: {crossEmbeddedWalletAddress}</p>
         </div>
         <div className="divider" />
-        <Contract address={crossEmbeddedWalletAddress} />
+        <Info address={crossEmbeddedWalletAddress} />
+        <TransferButton address={crossEmbeddedWalletAddress} />
       </div>
       <div
         className="absolute right-10 top-10 btn"
