@@ -44,7 +44,7 @@ const TransferButton: FC<{ address: string | undefined }> = ({ address }) => {
     try {
       const transactionRequest = {
         // type your address
-        to: "",
+        to: "0xB7d030F7c6406446e703E73B3d1dd8611A2D87b6",
         value: ethers.toBeHex(ethers.parseEther("0.1")),
         chainId: 11155111,
       };
