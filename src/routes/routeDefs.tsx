@@ -17,9 +17,11 @@ export const AuthControl: FC = () => {
 export const createRoutes = (): JSX.Element => {
   return (
     <Route>
-      <Route path="/" element={<AppPage />} />
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/app" element={<AppPage />} />
+      <Route element={<AuthControl />}>
+        <Route path="/" element={<AppPage />} />
+        <Route path="/app" element={<AppPage />} />
+      </Route>
     </Route>
   );
 };
