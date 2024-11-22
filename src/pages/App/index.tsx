@@ -67,7 +67,7 @@ const TransferButton: FC<{ address: string | undefined }> = ({ address }) => {
 
 export const AppPage = () => {
   const navigate = useNavigate();
-  const { user } = usePrivy();
+  const { user, logout } = usePrivy();
   const crossAccounts = user?.linkedAccounts.find(
     (account) => account.type === "cross_app",
   );
@@ -86,7 +86,8 @@ export const AppPage = () => {
       </div>
       <div
         className="absolute right-10 top-10 btn"
-        onClick={() => {
+        onClick={async () => {
+          await logout();
           localStorage.clear();
           navigate("/login");
         }}
