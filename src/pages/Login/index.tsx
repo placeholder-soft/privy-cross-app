@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 
 export const LoginPage = () => {
   const navigate = useNavigate();
+
   const { login } = useLogin({
     onComplete: () => {
       navigate("/app");
@@ -13,7 +14,7 @@ export const LoginPage = () => {
   });
 
   return (
-    <div className="h-screen flex justify-center items-center">
+    <div className="h-screen flex justify-center items-center gap-6">
       <button
         className="bg-blue-100 p-6 text-2xl rounded-3xl"
         onClick={() => login()}

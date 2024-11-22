@@ -9,14 +9,15 @@ import {
 } from "react-router-dom";
 import { createRoutes } from "./routes/routeDefs.tsx";
 
+export const GIFT_ART_APP_ID = 'clrraxjm604jjl60fwgcg5dru'
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <PrivyProvider
       appId='cm3sfyo5805w5ncgkld7gj7in'
       config={{
-        loginMethods: ["email"],
         loginMethodsAndOrder: {
-          primary: ['email', 'privy:clrraxjm604jjl60fwgcg5dru'],
+          primary: ['email', `privy:${GIFT_ART_APP_ID}`],
         },
         appearance: {
           theme: "light",
