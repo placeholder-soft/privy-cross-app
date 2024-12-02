@@ -5,9 +5,9 @@ import { usePrivy } from "@privy-io/react-auth";
 import { FC } from "react";
 
 export const AuthControl: FC = () => {
-  const { ready, authenticated, user } = usePrivy();
+  const {  authenticated, user } = usePrivy();
   const location = useLocation();
-  if (!ready || !authenticated || !user?.wallet?.address) {
+  if ( !authenticated || !user?.wallet?.address) {
     return <Navigate to="/login" replace state={{ location }} />;
   }
 
@@ -18,7 +18,7 @@ export const createRoutes = (): JSX.Element => {
   return (
     <Route>
       <Route path="/login" element={<LoginPage />} />
-      <Route element={<AuthControl />}>
+      <Route>
         <Route path="/" element={<AppPage />} />
         <Route path="/app" element={<AppPage />} />
       </Route>
