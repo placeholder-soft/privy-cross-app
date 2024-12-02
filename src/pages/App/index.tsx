@@ -65,11 +65,60 @@ const TransferButton: FC<{ address: string | undefined }> = ({ address }) => {
   );
 };
 
+const TransferUSDCButton: FC<{ address: string | undefined }> = ({
+  address,
+}) => {
+  const { sendTransaction } = useCrossAppAccounts();
+  const [transactionHash, setTransactionHash] = useState<string | null>(null);
+
+  const handleTransferUSDC = async () => {
+    if (!address) {
+      console.error("No cross-app wallet address found");
+      return;
+    }
+
+    try {
+      const usdcContractAddress = "0x309488d8698c9dda39ba4cce9f163932d1984d8b"; // USDC contract address on Ethereum mainnet
+      const usdcAmount = ethers.parseUnits("1", 18); // 10 USDC with 6 decimals
+      console.log(usdcAmount);
+      
+
+      const transactionRequest = {
+        to: usdcContractAddress,
+        value: 0, 
+        data: new ethers.Interface([
+          "function transfer(address to, uint256 amount)",
+        ]).encodeFunctionData("transfer", [
+          "0xB7d030F7c6406446e703E73B3d1dd8611A2D87b6",
+          usdcAmount,
+        ]),
+        chainId: 11155111,
+      };
+
+      const hash = await sendTransaction(transactionRequest, { address });
+
+      
+      setTransactionHash(hash);
+    } catch (error) {
+      console.error("USDC Transaction failed:", error);
+    }
+  };
+
+  return (
+    <div className="flex gap-4">
+      <button className="btn" onClick={handleTransferUSDC} disabled={!address}>
+        Transfer 1 USDT
+      </button>
+      {transactionHash && <p>Transaction Hash: {transactionHash}</p>}
+    </div>
+  );
+};
+
 export const AppPage = () => {
   const navigate = useNavigate();
   const { user, logout } = usePrivy();
   const crossAccounts = user?.linkedAccounts.find(
-    (account) => account.type === "cross_app",
+    (account) => account.type === "cross_app"
   );
   const crossEmbeddedWalletAddress = crossAccounts?.embeddedWallets[0]?.address;
 
@@ -82,7 +131,10 @@ export const AppPage = () => {
         </div>
         <div className="divider" />
         <Info address={crossEmbeddedWalletAddress} />
-        <TransferButton address={crossEmbeddedWalletAddress} />
+        <div className="flex flex-row gap-4">
+          <TransferButton address={crossEmbeddedWalletAddress} />
+          <TransferUSDCButton address={crossEmbeddedWalletAddress} />
+        </div>
       </div>
       <div
         className="absolute right-10 top-10 btn"
