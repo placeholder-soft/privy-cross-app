@@ -45,7 +45,7 @@ const TransferButton: FC<{ address: string | undefined }> = ({ address }) => {
     try {
       const transactionRequest = {
         to: recipientAddress,
-        value: ethers.toBeHex(ethers.parseEther("0.1")),
+        value: ethers.toBeHex(ethers.parseEther("0.0001")),
         chainId: 11155111,
       };
       const hash = await sendTransaction(transactionRequest, { address });
@@ -65,7 +65,7 @@ const TransferButton: FC<{ address: string | undefined }> = ({ address }) => {
         className="input border-gray-200"
       />
       <button className="btn" onClick={handleTransfer} disabled={!address || !recipientAddress}>
-        Transfer 0.1 ETH
+        Transfer 0.0001 ETH
       </button>
       {transactionHash && <p>Transaction Hash: {transactionHash}</p>}
     </div>
