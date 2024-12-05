@@ -34,6 +34,7 @@ const Info: FC<{ address: string | undefined }> = ({ address }) => {
 const TransferButton: FC<{ address: string | undefined }> = ({ address }) => {
   const { sendTransaction } = useCrossAppAccounts();
   const [transactionHash, setTransactionHash] = useState<string | null>(null);
+  const [recipientAddress, setRecipientAddress] = useState<string>("");
 
   const handleTransfer = async () => {
     if (!address) {
@@ -43,8 +44,7 @@ const TransferButton: FC<{ address: string | undefined }> = ({ address }) => {
 
     try {
       const transactionRequest = {
-        // type your address
-        to: "0xB7d030F7c6406446e703E73B3d1dd8611A2D87b6",
+        to: recipientAddress,
         value: ethers.toBeHex(ethers.parseEther("0.1")),
         chainId: 11155111,
       };
@@ -57,7 +57,14 @@ const TransferButton: FC<{ address: string | undefined }> = ({ address }) => {
 
   return (
     <div className="flex gap-4">
-      <button className="btn" onClick={handleTransfer} disabled={!address}>
+      <input
+        type="text"
+        placeholder="Enter recipient address"
+        value={recipientAddress}
+        onChange={(e) => setRecipientAddress(e.target.value)}
+        className="input border-gray-200"
+      />
+      <button className="btn" onClick={handleTransfer} disabled={!address || !recipientAddress}>
         Transfer 0.1 ETH
       </button>
       {transactionHash && <p>Transaction Hash: {transactionHash}</p>}
@@ -70,6 +77,7 @@ const TransferUSDCButton: FC<{ address: string | undefined }> = ({
 }) => {
   const { sendTransaction } = useCrossAppAccounts();
   const [transactionHash, setTransactionHash] = useState<string | null>(null);
+  const [recipientAddress, setRecipientAddress] = useState<string>("");
 
   const handleTransferUSDC = async () => {
     if (!address) {
@@ -80,8 +88,6 @@ const TransferUSDCButton: FC<{ address: string | undefined }> = ({
     try {
       const usdcContractAddress = "0x309488d8698c9dda39ba4cce9f163932d1984d8b"; // USDC contract address on Ethereum mainnet
       const usdcAmount = ethers.parseUnits("1", 18); // 10 USDC with 6 decimals
-      console.log(usdcAmount);
-      
 
       const transactionRequest = {
         to: usdcContractAddress,
@@ -89,15 +95,13 @@ const TransferUSDCButton: FC<{ address: string | undefined }> = ({
         data: new ethers.Interface([
           "function transfer(address to, uint256 amount)",
         ]).encodeFunctionData("transfer", [
-          "0xB7d030F7c6406446e703E73B3d1dd8611A2D87b6",
+          recipientAddress,
           usdcAmount,
         ]),
         chainId: 11155111,
       };
 
       const hash = await sendTransaction(transactionRequest, { address });
-
-      
       setTransactionHash(hash);
     } catch (error) {
       console.error("USDC Transaction failed:", error);
@@ -106,7 +110,14 @@ const TransferUSDCButton: FC<{ address: string | undefined }> = ({
 
   return (
     <div className="flex gap-4">
-      <button className="btn" onClick={handleTransferUSDC} disabled={!address}>
+      <input
+        type="text"
+        placeholder="Enter recipient address"
+        value={recipientAddress}
+        onChange={(e) => setRecipientAddress(e.target.value)}
+        className="input border-gray-200"
+      />
+      <button className="btn" onClick={handleTransferUSDC} disabled={!address || !recipientAddress}>
         Transfer 1 USDT
       </button>
       {transactionHash && <p>Transaction Hash: {transactionHash}</p>}
@@ -131,7 +142,7 @@ export const AppPage = () => {
         </div>
         <div className="divider" />
         <Info address={crossEmbeddedWalletAddress} />
-        <div className="flex flex-row gap-4">
+        <div className="flex flex-col gap-4">
           <TransferButton address={crossEmbeddedWalletAddress} />
           <TransferUSDCButton address={crossEmbeddedWalletAddress} />
         </div>
