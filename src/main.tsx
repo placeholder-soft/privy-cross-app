@@ -9,7 +9,7 @@ import {
 } from "react-router-dom";
 import { createRoutes } from "./routes/routeDefs.tsx";
 
-export const GIFT_ART_APP_ID = 'clrraxjm604jjl60fwgcg5dru'
+export const GIFT_ART_APP_ID = 'clt8w3guc082a12djsayai4py'
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
