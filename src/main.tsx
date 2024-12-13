@@ -17,7 +17,10 @@ createRoot(document.getElementById("root")!).render(
       appId='cm3sfyo5805w5ncgkld7gj7in'
       config={{
         loginMethodsAndOrder: {
-          primary: ['email', `privy:${GIFT_ART_APP_ID}`],
+          primary: [
+            // 'email', // use email as login method, uncomment to enable
+            `privy:${GIFT_ART_APP_ID}`, // using Gifted.art's account as the login method
+          ],
         },
         appearance: {
           theme: "light",

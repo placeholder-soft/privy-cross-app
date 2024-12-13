@@ -1,24 +1,28 @@
-# Privy Cross App - Gift Art Platform
+# Privy Cross-App Integration Demo
 
-This project is a template for building a React application using TypeScript and Vite, specifically designed for a Gift Art Platform. It includes hot module replacement (HMR) and some ESLint rules to ensure code quality. The platform integrates with Privy for authentication and cross-app accounts, providing a seamless user experience.
+This project demonstrates how to integrate Privy's cross-app functionality into any application, using Gifted.art as the provider. It showcases how a requestor app can interact with a user's wallet that is connected to Gifted.art, enabling signing and transaction operations through cross-app authentication.
 
-## Features
+## Overview
 
-- **React**: A JavaScript library for building user interfaces, enabling the creation of dynamic and interactive web applications.
-- **TypeScript**: A typed superset of JavaScript that compiles to plain JavaScript, offering enhanced code quality and developer productivity.
-- **Vite**: A build tool that provides a fast development environment with instant server start and lightning-fast HMR.
-- **ESLint**: A tool for identifying and fixing problems in JavaScript code, ensuring consistent code quality and style.
-- **Privy Integration**: Utilizes Privy for secure authentication and management of cross-app accounts, enhancing user security and convenience.
-  - **Cross-App Accounts**: Allows users to link their accounts across different applications, providing a unified experience. This is particularly useful for users who want to manage their digital assets or identities across multiple platforms.
-  - **Embedded Wallets**: Privy supports the creation of embedded wallets, which can be automatically generated for users without existing wallets. This feature simplifies the onboarding process and enhances user engagement.
-- **React Router**: For handling routing in the application, allowing for smooth navigation between different pages.
-- **Tailwind CSS**: A utility-first CSS framework for styling, enabling rapid UI development with a modern design.
+This demo shows how any application can:
+
+- Integrate with Privy for authentication
+- Connect to a user's Gifted.art account
+- Request signing operations from the user's wallet connected to Gifted.art
+- Initiate transactions using the tokens in the user's Gifted.art-connected wallet
+
+## Provider's App IDs
+
+| Environment | Website URL                  | Gifted.art App ID           |
+| ----------- | ---------------------------- | --------------------------- |
+| Test        | `https://staging.gifted.art` | `clt8w3guc082a12djsayai4py` |
+| Production  | `https://gifted.art`         | `clrraxjm604jjl60fwgcg5dru` |
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js and npm (or pnpm) installed on your machine.
+- Node.js and pnpm installed on your machine
 
 ### Installation
 
@@ -40,42 +44,25 @@ This project is a template for building a React application using TypeScript and
 To start the development server, run:
 
 ```bash
-pnpm dev
+pnpm start
 ```
-
-This will start the Vite development server and open the application in your default web browser.
-
-### Building for Production
-
-To build the application for production, run:
-
-```bash
-pnpm build
-```
-
-This will create an optimized build of the application in the `dist` directory.
 
 ## Project Structure
 
-- **src/main.tsx**: The entry point of the application. It sets up the React application with the `PrivyProvider` and `RouterProvider`.
-- **src/pages/App/index.tsx**: The main application page, which includes components for signing messages and linking cross-app accounts.
-- **src/pages/Login/index.tsx**: The login page, which uses Privy's login functionality to authenticate users.
-- **src/routes/routeDefs.tsx**: Defines the routes for the application using React Router, managing navigation and access control.
-- **src/styles/index.css**: The main stylesheet, utilizing Tailwind CSS for responsive and modern design.
-- **src/assets/react.svg**: An SVG asset used in the application, representing the React logo.
+- **src/main.tsx**: Entry point of the application, configures the `PrivyProvider` and routing
+- **src/pages/App/index.tsx**: Main application page demonstrating cross-app integration features:
+  - Signing message requests
+  - Transaction requests
+  - Cross-app account linking with Gifted.art
+- **src/pages/Login/index.tsx**: Authentication page using Privy's login system
 
-## Expanding the ESLint Configuration
+## How It Works
 
-For production applications, consider expanding the ESLint configuration to enable type-aware lint rules. See the comments in the `eslint.config.js` file for more details.
+1. Users authenticate using Privy in your application
+2. Users can link their Gifted.art account through Privy's cross-app functionality
+3. Your application can then:
+   - Request message signatures from the user's wallet connected to Gifted.art
+   - Initiate transactions using tokens in the user's Gifted.art wallet
+   - Access other wallet-related functionality through the cross-app integration
 
-## License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-- [Vite](https://vitejs.dev/)
-- [React](https://reactjs.org/)
-- [TypeScript](https://www.typescriptlang.org/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [Privy](https://privy.io/)
+This template provides a foundation for building applications that leverage Privy's cross-app capabilities with Gifted.art as the provider platform.
