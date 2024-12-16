@@ -86,7 +86,7 @@ const TransferUSDCButton: FC<{ address: string | undefined }> = ({
     }
 
     try {
-      const usdcContractAddress = "0x309488d8698c9dda39ba4cce9f163932d1984d8b"; // USDC contract address
+      const usdcContractAddress = "0x9e0D7B454676116C123d56ff4d5ed609D75Ad00E"; // USDC contract address
       const usdcAmount = ethers.parseUnits("1", 18); // 10 USDC with 18 decimals
 
       const transactionRequest = {
