@@ -18,7 +18,7 @@ createRoot(document.getElementById("root")!).render(
       config={{
         loginMethodsAndOrder: {
           primary: [
-            // 'email', // use email as login method, uncomment to enable
+            'email', // use email as login method, uncomment to enable
             `privy:${GIFT_ART_APP_ID}`, // using Gifted.art's account as the login method
           ],
         },
