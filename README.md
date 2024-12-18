@@ -1,6 +1,6 @@
 # Privy Cross-App Integration Demo
 
-This project demonstrates how to integrate Privy's cross-app functionality into any application, using Gifted.art as the provider. It showcases how a requestor app can interact with a user's wallet that is connected to Gifted.art, enabling signing and transaction operations through cross-app authentication. 
+This project demonstrates how to integrate Privy's cross-app functionality into any application, using Gifted.art as the provider. It showcases how a requestor app can interact with a user's wallet that is connected to Gifted.art, enabling signing and transaction operations through cross-app authentication.
 
 The documentation for Privy's cross-app functionality can be found at [https://docs.privy.io/guide/react/cross-app](https://docs.privy.io/guide/react/cross-app/).
 
@@ -27,17 +27,16 @@ This demo shows how any application can:
 [src/main.tsx](src/main.tsx)
 
 ```tsx
-    <PrivyProvider
-      appId='cm3sfyo5805w5ncgkld7gj7in'
-      config={{
-        loginMethodsAndOrder: {
-          primary: [
-            `privy:${GIFT_ART_APP_ID}`, // using Gifted.art's account as the login method
-          ],
-        },
-      }}
-    >
-    </PrivyProvider>
+<PrivyProvider
+  appId="cm3sfyo5805w5ncgkld7gj7in"
+  config={{
+    loginMethodsAndOrder: {
+      primary: [
+        `privy:${GIFT_ART_APP_ID}`, // using Gifted.art's account as the login method
+      ],
+    },
+  }}
+></PrivyProvider>
 ```
 
 ### Transferring ETH from the user's Gifted.art wallet
@@ -46,37 +45,139 @@ This demo shows how any application can:
 
 ```tsx
 const { sendTransaction } = useCrossAppAccounts();
-const transactionRequest = {
-   to: recipientAddress,
-   value: ethers.toBeHex(ethers.parseEther("0.0001")),
-   chainId: 11155111,
+const [amount, setAmount] = useState<string>("");
+
+const handleTransfer = async () => {
+  const transactionRequest = {
+    to: recipientAddress,
+    value: ethers.toBeHex(ethers.parseEther(amount)),
+    chainId: 11155111,
+  };
+  const hash = await sendTransaction(transactionRequest, { address });
 };
-const hash = await sendTransaction(transactionRequest, { address });
+
+return (
+  <div className="flex gap-4">
+    <input
+      type="text"
+      placeholder="Enter recipient address"
+      value={recipientAddress}
+      onChange={(e) => setRecipientAddress(e.target.value)}
+    />
+    <input
+      type="number"
+      placeholder="ETH amount"
+      value={amount}
+      onChange={(e) => setAmount(e.target.value)}
+      step="0.0001"
+      min="0"
+    />
+    <button onClick={handleTransfer}>Transfer ETH</button>
+  </div>
+);
 ```
 
 ### Transfer USDC from the user's Gifted.art wallet
+
 Note: For mainnet, use the correct USDC contract address and decimals (e.g. 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913 with 6 decimals on base mainnet)
 
-
 [src/pages/App/index.tsx](src/pages/App/index.tsx)
+
 ```tsx
 const { sendTransaction } = useCrossAppAccounts();
-const usdcContractAddress = "0x309488d8698c9dda39ba4cce9f163932d1984d8b"; // USDC contract address on sepolia
-const usdcAmount = ethers.parseUnits("1", 18); // 10 USDC with 18 decimals
+const [amount, setAmount] = useState<string>("");
+const usdcContractAddress = "0x9e0D7B454676116C123d56ff4d5ed609D75Ad00E"; // USDC contract address
 
-const transactionRequest = {
-   to: usdcContractAddress,
-   value: 0, 
-   data: new ethers.Interface([
+const handleTransferUSDC = async () => {
+  const usdcAmount = ethers.parseUnits(amount, 18);
+  const transactionRequest = {
+    to: usdcContractAddress,
+    value: 0,
+    data: new ethers.Interface([
       "function transfer(address to, uint256 amount)",
-   ]).encodeFunctionData("transfer", [
-      recipientAddress,
-      usdcAmount,
-   ]),
-   chainId: 11155111,
+    ]).encodeFunctionData("transfer", [recipientAddress, usdcAmount]),
+    chainId: 11155111,
+  };
+
+  const hash = await sendTransaction(transactionRequest, { address });
 };
 
-const hash = await sendTransaction(transactionRequest, { address });
+return (
+  <div className="flex gap-4">
+    <input
+      type="text"
+      placeholder="Enter recipient address"
+      value={recipientAddress}
+      onChange={(e) => setRecipientAddress(e.target.value)}
+    />
+    <input
+      type="number"
+      placeholder="USDC amount"
+      value={amount}
+      onChange={(e) => setAmount(e.target.value)}
+      step="0.000001"
+      min="0"
+    />
+    <button onClick={handleTransferUSDC}>Transfer USDC</button>
+  </div>
+);
+```
+
+### Displaying Wallet Balances
+
+[src/pages/App/index.tsx](src/pages/App/index.tsx)
+
+```tsx
+const BalanceDisplay: FC<{ address: string | undefined }> = ({ address }) => {
+  const [ethBalance, setEthBalance] = useState<string>("");
+  const [usdcBalance, setUsdcBalance] = useState<string>("");
+
+  useEffect(() => {
+    const fetchBalances = async () => {
+      if (!address) return;
+
+      try {
+        const provider = new ethers.JsonRpcProvider("https://rpc.sepolia.org");
+
+        // Get ETH balance
+        const balance = await provider.getBalance(address);
+        setEthBalance(ethers.formatEther(balance));
+
+        // Get USDC balance
+        const usdcContract = new ethers.Contract(
+          usdcContractAddress,
+          ["function balanceOf(address) view returns (uint256)"],
+          provider
+        );
+        const usdcBalance = await usdcContract.balanceOf(address);
+        setUsdcBalance(ethers.formatUnits(usdcBalance, 18));
+      } catch (error) {
+        console.error("Error fetching balances:", error);
+      }
+    };
+
+    fetchBalances();
+    const intervalId = setInterval(fetchBalances, 10000); // Refresh every 10 seconds
+    return () => clearInterval(intervalId);
+  }, [address]);
+
+  return (
+    <div>
+      <p>ETH Balance: {ethBalance ? `${ethBalance} ETH` : "Loading..."}</p>
+      <p>USDC Balance: {usdcBalance ? `${usdcBalance} USDC` : "Loading..."}</p>
+    </div>
+  );
+};
+
+const App = () => {
+  const { user, logout } = usePrivy();
+  const crossAccounts = user?.linkedAccounts.find(
+    (account) => account.type === "cross_app"
+  );
+  const crossEmbeddedWalletAddress = crossAccounts?.embeddedWallets[0]?.address;
+
+  return <BalanceDisplay address={crossEmbeddedWalletAddress} />;
+};
 ```
 
 ### Requesting a signature from the user's Gifted.art wallet
@@ -86,11 +187,11 @@ const hash = await sendTransaction(transactionRequest, { address });
 ```tsx
 const { signMessage } = useCrossAppAccounts();
 <button
-   className="btn"
-   onClick={() => signMessage("Hello world", { address: address! })}
+  className="btn"
+  onClick={() => signMessage("Hello world", { address: address! })}
 >
-   Sign a message
-</button>
+  Sign a message
+</button>;
 ```
 
 ### Linking a Gifted.art account to a Privy account
@@ -100,11 +201,11 @@ const { signMessage } = useCrossAppAccounts();
 ```tsx
 const { linkCrossAppAccount } = useCrossAppAccounts();
 <button
-   className="btn"
-   onClick={() => linkCrossAppAccount({ appId: GIFT_ART_APP_ID })}
+  className="btn"
+  onClick={() => linkCrossAppAccount({ appId: GIFT_ART_APP_ID })}
 >
-   Link your gift account
-</button>
+  Link your gift account
+</button>;
 ```
 
 ## Getting Started
