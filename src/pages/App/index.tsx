@@ -1,8 +1,8 @@
 import { useCrossAppAccounts, usePrivy } from "@privy-io/react-auth";
 import { FC, useState, useEffect } from "react";
-import { GIFT_ART_APP_ID } from "../../main.tsx";
 import { useNavigate } from "react-router";
 import { ethers } from "ethers";
+import { env } from "../../env.ts";
 
 const usdcContractAddress = "0x9e0D7B454676116C123d56ff4d5ed609D75Ad00E";
 
@@ -23,7 +23,7 @@ const Info: FC<{ address: string | undefined }> = ({ address }) => {
         </button>
         <button
           className="btn"
-          onClick={() => linkCrossAppAccount({ appId: GIFT_ART_APP_ID })}
+          onClick={() => linkCrossAppAccount({ appId: env.VITE_PRIVY_APP_ID })}
           disabled={!ready || !authenticated}
         >
           Link your gift account

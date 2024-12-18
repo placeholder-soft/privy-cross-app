@@ -8,18 +8,17 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import { createRoutes } from "./routes/routeDefs.tsx";
-
-export const GIFT_ART_APP_ID = 'clt8w3guc082a12djsayai4py'
+import { env } from "./env.ts";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <PrivyProvider
-      appId='cm3sfyo5805w5ncgkld7gj7in'
+      appId="cm3sfyo5805w5ncgkld7gj7in"
       config={{
         loginMethodsAndOrder: {
           primary: [
-            'email', // use email as login method, uncomment to enable
-            `privy:${GIFT_ART_APP_ID}`, // using Gifted.art's account as the login method
+            "email", // use email as login method, uncomment to enable
+            `privy:${env.VITE_PRIVY_APP_ID}`, // using Gifted.art's account as the login method
           ],
         },
         appearance: {
@@ -36,5 +35,5 @@ createRoot(document.getElementById("root")!).render(
         router={createBrowserRouter(createRoutesFromElements(createRoutes()))}
       />
     </PrivyProvider>
-  </StrictMode>,
+  </StrictMode>
 );
