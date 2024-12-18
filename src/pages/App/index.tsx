@@ -3,6 +3,7 @@ import { FC, useState, useEffect } from "react";
 import { GIFT_ART_APP_ID } from "../../main.tsx";
 import { useNavigate } from "react-router";
 import { ethers } from "ethers";
+import { env } from "../../env.ts";
 
 const usdcContractAddress = "0x9e0D7B454676116C123d56ff4d5ed609D75Ad00E";
 
@@ -206,6 +207,9 @@ export const AppPage = () => {
     (account) => account.type === "cross_app"
   );
   const crossEmbeddedWalletAddress = crossAccounts?.embeddedWallets[0]?.address;
+
+console.log(env.VITE_PRIVY_APP_ID);
+  
 
   return (
     <div className="h-screen flex flex-col justify-center items-center text-lg">
