@@ -1,6 +1,5 @@
 import { useCrossAppAccounts, usePrivy } from "@privy-io/react-auth";
 import { FC, useState, useEffect } from "react";
-import { GIFT_ART_APP_ID } from "../../main.tsx";
 import { useNavigate } from "react-router";
 import { ethers } from "ethers";
 import { env } from "../../env.ts";
@@ -24,7 +23,7 @@ const Info: FC<{ address: string | undefined }> = ({ address }) => {
         </button>
         <button
           className="btn"
-          onClick={() => linkCrossAppAccount({ appId: GIFT_ART_APP_ID })}
+          onClick={() => linkCrossAppAccount({ appId: env.VITE_PRIVY_APP_ID })}
           disabled={!ready || !authenticated}
         >
           Link your gift account
@@ -207,9 +206,6 @@ export const AppPage = () => {
     (account) => account.type === "cross_app"
   );
   const crossEmbeddedWalletAddress = crossAccounts?.embeddedWallets[0]?.address;
-
-console.log(env.VITE_PRIVY_APP_ID);
-  
 
   return (
     <div className="h-screen flex flex-col justify-center items-center text-lg">
