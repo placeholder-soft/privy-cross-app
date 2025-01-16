@@ -123,6 +123,100 @@ return (
 );
 ```
 
+### Transfer All ETH from the user's Gifted.art wallet
+
+[src/pages/App/index.tsx](src/pages/App/index.tsx)
+
+```tsx
+const PERCENTAGE = 120; // Gas estimate safety margin (120%)
+
+const { sendTransaction } = useCrossAppAccounts();
+const [recipientAddress, setRecipientAddress] = useState<string>("");
+
+const getMaxETH = async (address: string) => {
+  try {
+    const provider = new ethers.JsonRpcProvider(
+      "https://eth-sepolia.g.alchemy.com/v2/YOUR_API_KEY"
+    );
+
+    // Get current balance
+    const balance = await provider.getBalance(address);
+
+    // Estimate gas for the transfer
+    const gasEstimate = await provider.estimateGas({
+      from: address,
+      to: recipientAddress,
+      value: balance,
+    });
+
+    // Get current block and fee data
+    const [block, feeData] = await Promise.all([
+      provider.getBlock("latest"),
+      provider.getFeeData(),
+    ]);
+    if (!block?.baseFeePerGas || !feeData.maxPriorityFeePerGas) {
+      throw new Error("Failed to get fee data");
+    }
+
+    // Calculate total fee per gas
+    const totalFeePerGas = block.baseFeePerGas + feeData.maxPriorityFeePerGas;
+
+    // Calculate total gas cost with safety margin
+    const gasLimit = (gasEstimate * BigInt(PERCENTAGE)) / BigInt(100);
+    const gasCost = gasLimit * totalFeePerGas;
+
+    // Calculate max amount that can be sent (balance - gas cost)
+    const maxAmount = balance - gasCost;
+
+    if (maxAmount <= BigInt(0)) {
+      throw new Error("Insufficient balance to cover gas costs");
+    }
+
+    return maxAmount;
+  } catch (error) {
+    console.error("Error calculating max ETH:", error);
+    return null;
+  }
+};
+
+const handleTransferAll = async () => {
+  if (!address || !recipientAddress) {
+    console.error("Missing address information");
+    return;
+  }
+
+  try {
+    const maxAmount = await getMaxETH(address);
+    if (!maxAmount) {
+      console.error("Failed to calculate max amount");
+      return;
+    }
+
+    const transactionRequest = {
+      to: recipientAddress,
+      value: ethers.toBeHex(maxAmount),
+      chainId: 11155111,
+    };
+
+    const hash = await sendTransaction(transactionRequest, { address });
+  } catch (error) {
+    console.error("Transfer all ETH failed:", error);
+  }
+};
+
+return (
+  <div className="flex gap-4">
+    <input
+      type="text"
+      placeholder="Enter recipient address"
+      value={recipientAddress}
+      onChange={(e) => setRecipientAddress(e.target.value)}
+    />
+    <button onClick={handleTransferAll}>Transfer All ETH</button>
+  </div>
+);
+```
+
 ### Displaying Wallet Balances
 
 [src/pages/App/index.tsx](src/pages/App/index.tsx)
