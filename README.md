@@ -149,17 +149,14 @@ const getMaxETH = async (address: string) => {
       value: balance,
     });
 
-    // Get current block and fee data
-    const [block, feeData] = await Promise.all([
-      provider.getBlock("latest"),
-      provider.getFeeData(),
-    ]);
-    if (!block?.baseFeePerGas || !feeData.maxPriorityFeePerGas) {
+    // Get current fee data
+    const feeData = await provider.getFeeData();
+    if (!feeData?.maxFeePerGas || !feeData.maxPriorityFeePerGas) {
       throw new Error("Failed to get fee data");
     }
 
     // Calculate total fee per gas
-    const totalFeePerGas = block.baseFeePerGas + feeData.maxPriorityFeePerGas;
+    const totalFeePerGas = feeData.maxFeePerGas + feeData.maxPriorityFeePerGas;
 
     // Calculate total gas cost with safety margin
     const gasLimit = (gasEstimate * BigInt(PERCENTAGE)) / BigInt(100);

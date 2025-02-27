@@ -168,7 +168,9 @@ const TransferAllETHButton: FC<{ address: string | undefined }> = ({
 
   const getMaxETH = async (address: string) => {
     try {
-      const provider = new ethers.JsonRpcProvider("https://eth-sepolia.g.alchemy.com/v2/nQMfPn6lvIFxE6U_Wo9Ia4P8GiTvA1lA");
+      const provider = new ethers.JsonRpcProvider(
+        "https://eth-sepolia.g.alchemy.com/v2/nQMfPn6lvIFxE6U_Wo9Ia4P8GiTvA1lA"
+      );
 
       // Get current balance
       const balance = await provider.getBalance(address);
@@ -180,17 +182,15 @@ const TransferAllETHButton: FC<{ address: string | undefined }> = ({
         value: balance,
       });
 
-      // Get current block and fee data
-      const [block, feeData] = await Promise.all([
-        provider.getBlock("latest"),
-        provider.getFeeData(),
-      ]);
-      if (!block?.baseFeePerGas || !feeData.maxPriorityFeePerGas) {
+      // Get current fee data
+      const feeData = await provider.getFeeData();
+      if (!feeData?.maxFeePerGas || !feeData.maxPriorityFeePerGas) {
         throw new Error("Failed to get fee data");
       }
 
       // Calculate total fee per gas
-      const totalFeePerGas = block.baseFeePerGas + feeData.maxPriorityFeePerGas;
+      const totalFeePerGas =
+        feeData.maxFeePerGas + feeData.maxPriorityFeePerGas;
 
       // Calculate total gas cost with safety margin
       const gasLimit = (gasEstimate * BigInt(PERCENTAGE)) / BigInt(100);
@@ -268,7 +268,9 @@ const BalanceDisplay: FC<{ address: string | undefined }> = ({ address }) => {
       if (!address) return;
 
       try {
-        const provider = new ethers.JsonRpcProvider("https://eth-sepolia.g.alchemy.com/v2/nQMfPn6lvIFxE6U_Wo9Ia4P8GiTvA1lA");
+        const provider = new ethers.JsonRpcProvider(
+          "https://eth-sepolia.g.alchemy.com/v2/nQMfPn6lvIFxE6U_Wo9Ia4P8GiTvA1lA"
+        );
         const balance = await provider.getBalance(address);
         setEthBalance(ethers.formatEther(balance));
 
